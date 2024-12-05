@@ -1,1 +1,3 @@
-# projeto-sistema-controle-financeiro
+# Projeto Sistema de Controle Financeiro
+
+### Em andamento
