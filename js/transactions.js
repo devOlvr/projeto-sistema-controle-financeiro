@@ -1,62 +1,50 @@
 const counterMoney = {
-  valueAccount: Number,
-  description: String,
+  valueAccount: 0,
+  payment: 0,
+  description: "",
 };
 
-function handleOutcomeTransaction() {
-  const outcomeValue = document.querySelector("#outcomeValue").checked;
-  const valueInput = parseFloat(document.querySelector("#valueInput").value);
-  const descriptionValue = document.querySelector("#descriptionInput").value;
-
-  if (isNaN(valueInput) || valueInput <= 0) {
-    alert("INSIRA UM NÚMERO VÁLIDO");
-    return;
-  }
-
-  if (outcomeValue) {
-    counterMoney.valueAccount = valueInput * -1;
-    counterMoney.description = descriptionValue;
-    console.log(counterMoney);
-    document.querySelector(
-      "#counter"
-    ).innerHTML = `R$${counterMoney.valueAccount}`;
-  } else {
-    alert("Erro ao tentar atualizar o saldo");
-  }
-
-  if (counterMoney.valueAccount < 0) {
-    document.querySelector("#counter").style.color = "red";
-  } else {
-    document.querySelector("#counter").style.color = "green";
-  }
+function updateValue() {
+  const counterActual = document.querySelector("#counter");
+  counterActual.innerHTML = `R$${counterMoney.valueAccount.toFixed(2)}`;
 }
 
-function handleIncomeTransaction() {
-  const incomeValue = document.querySelector("#incomeValue").checked;
+function showMessage(errorMessage) {
+  alert(errorMessage);
+}
+
+function handleTransaction(isIncome) {
   const valueInput = parseFloat(document.querySelector("#valueInput").value);
   const descriptionValue = document.querySelector("#descriptionInput").value;
 
   if (isNaN(valueInput) || valueInput <= 0) {
-    alert("INSIRA UM NÚMERO VÁLIDO");
+    showMessage("INSIRA UM VALOR VÁLIDO");
     return;
   }
 
-  if (incomeValue) {
-    counterMoney.valueAccount += valueInput;
-    counterMoney.description = descriptionValue;
-    console.log(counterMoney);
-    document.querySelector(
-      "#counter"
-    ).innerHTML = `R$${counterMoney.valueAccount}`;
-  } else {
-    alert("Erro ao tentar atualizar o saldo");
+  if (
+    !isIncome &&
+    (counterMoney.valueAccount <= 0 || valueInput > counterMoney.valueAccount)
+  ) {
+    showMessage("SALDO INVÁLIDO");
+    return;
   }
 
-  if (counterMoney.valueAccount < 0) {
-    document.querySelector("#counter").style.color = "red";
+  if (isIncome) {
+    counterMoney.valueAccount += valueInput;
   } else {
-    document.querySelector("#counter").style.color = "green";
+    counterMoney.valueAccount -= valueInput;
   }
+
+  counterMoney.payment = valueInput;
+  counterMoney.description = descriptionValue;
+
+  console.log(
+    isIncome ? "Transação Recebida" : "Transação Realizada:",
+    counterMoney
+  );
+  showMessage(isIncome ? "PIX RECEBIDO DE ANÔNIMO" : "TRANSAÇÃO REALIZADA");
+  updateValue();
 }
 
 document.querySelector("form").addEventListener("submit", (e) => {
@@ -66,10 +54,10 @@ document.querySelector("form").addEventListener("submit", (e) => {
   const incomeValue = document.querySelector("#incomeValue").checked;
 
   if (outcomeValue) {
-    handleOutcomeTransaction();
+    handleTransaction(false);
   } else if (incomeValue) {
-    handleIncomeTransaction();
+    handleTransaction(true);
   } else {
-    alert("Erro ao tentar fazer uma transação!");
+    showMessage("Erro ao tentar fazer uma transação!");
   }
 });
